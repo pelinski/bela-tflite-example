@@ -31,7 +31,7 @@ void usage(const char *processName)
     Bela_usage();
 
     std::cerr << "   --onnx [-n] filename:               Name of the file to load\n";
-    std::cerr << "   --useArmnn [-a]					  					Use ArmmNN Delegate\n";
+    std::cerr << "   --useArmnn [-a]                     Use ArmmNN Delegate\n";
     std::cerr << "   --help [-h]:                        Print this menu\n";
 }
 
@@ -44,7 +44,6 @@ int main(int argc, char *argv[])
         {
             {"help", 0, NULL, 'h'},
             {"model", 1, NULL, 'm'},
-            {"frontend", 0, NULL, 'f'},
             {NULL, 0, NULL, 0}};
 
     // Set default settings
@@ -74,9 +73,6 @@ int main(int argc, char *argv[])
             break;
         case 'm':
             opts.modelPath = (char *)optarg;
-            break;
-        case 'f':
-            opts.frontend = (int)optarg;
             break;
         default:
             usage(basename(argv[0]));
