@@ -9,31 +9,34 @@
 #include "tensorflow/lite/tools/gen_op_registration.h"
 #include "AppOptions.h"
 
+std::unique_ptr<tflite::FlatBufferModel> model;
+tflite::ops::builtin::BuiltinOpResolver resolver;
+std::unique_ptr<tflite::Interpreter> interpreter;
 
 bool setup(BelaContext *context, void *userData)
 {   
-    rt_printf("analog sample rate: %.1f\n", context->analogSampleRate);
+    rt_printf("Analog sample rate: %.1f\n", context->analogSampleRate);
     
     AppOptions *opts = reinterpret_cast<AppOptions *>(userData);
 
-    std::unique_ptr<tflite::FlatBufferModel> model = tflite::FlatBufferModel::BuildFromFile(opts->modelPath.c_str());
+    model = tflite::FlatBufferModel::BuildFromFile(opts->modelPath.c_str());
         if(!model){
         printf("Failed to mmap model\n");
         return false;
     }
 
-
-
-    tflite::ops::builtin::BuiltinOpResolver resolver;
-    std::unique_ptr<tflite::Interpreter> interpreter;
     tflite::InterpreterBuilder(*model.get(), resolver)(&interpreter);
 
-    // Resize input tensors, if desired.
     interpreter->AllocateTensors();
 
-    float* input = interpreter->typed_input_tensor<float>(0);
-    // Dummy input for testing
+	return true;
+}
 
+void render(BelaContext *context, void *userData)
+{
+    float* input = interpreter->typed_input_tensor<float>(0);
+    
+    // Dummy input for testing
     *input = 2.0;
     rt_printf("Input is: %.2f\n", *input);
 
@@ -41,13 +44,6 @@ bool setup(BelaContext *context, void *userData)
 
     float* output = interpreter->typed_output_tensor<float>(0);
     rt_printf("Result is: %.2f\n", *output);
-
-
-	return true;
-}
-
-void render(BelaContext *context, void *userData)
-{
 
 }
 
